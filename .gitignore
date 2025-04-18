@@ -1,3 +1,4 @@
 cross-composer/
 cross-composer_chroma-nnls.zip
 windows_bach.pkl
+*.DS_Store
