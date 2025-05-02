@@ -10,7 +10,7 @@ class Oeuvre:
         self.filename = None
         self.matrix = None
 
-    def pp(self):
+    def __str__(self):
         return f"""
         Titre : {self.titre}
         Compositeur : {self.compositeur}
@@ -19,5 +19,5 @@ class Oeuvre:
         Fichier d'origine : {self.filename}
         """
     
-    def __str__(self):
+    def __repr__(self):
         return f"{self.compositeur} - {self.titre} - {self.genre}"
