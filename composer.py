@@ -10,9 +10,20 @@ import json
 from ipysigma import Sigma
 
 class Composer:
-    def __init__(self,ID,nom=None,prenom=None,naissance=None,mort=None,desc=None,influences = []):
-        self.id = ID
-        self.name = nom
+    def __init__(self,ID="Q36834",nomcomplet=None,nom=None,prenom=None,naissance=None,mort=None,desc=None,influences = []):
+        if ID=="Q36834":
+            if prenom is not None and nom is not None:
+                self.id=find_id((prenom,nom))
+            elif nomcomplet is not None :
+                self.id=find_id(nomcomplet)
+            elif nom is not None :
+                self.id=find_id(nom)
+            else:
+                self.id=ID
+        else:
+            self.id = ID
+        self.name = nomcomplet
+        self.familyname = nom
         self.firstname = prenom
         self.birth = naissance
         self.death = mort
@@ -23,12 +34,13 @@ class Composer:
         entity_id = self.id
         #Dictionnaire des propriétés souhaitées
         dico_props = {"pays" : "P27",
-              "nom" : "P735",
-              "prenom" : "P734",
+              "nom" : "P734",
+              "prenom" : "P735",
               "date de naissance" : "P569",
               "date de mort" : "P570",
               "genre" : "P136",
-              "influences" : "P737",
+              "influencé par" : "P737",
+              "inverse property label item" : "Q65932995", #il reste à comprendre comment s'en servir
               "oeuvres":"P800",
               "religion" : "P140",
               "étudiant de" : "P1066",
@@ -89,22 +101,28 @@ class Composer:
             for name, prop in dico_props.items():
                 if prop in properties:
                     proprietes[name] = properties[prop]
-                if name == "date de naissance" :
-                    self.birth = properties[prop]
-                if name == "date de mort" :
-                    self.death = properties[prop]
-                if name == "prenom" :
-                    self.firstname = properties[prop]
+                    if name == "date de naissance" :
+                        self.birth = properties[prop]
+                    if name == "date de mort" :
+                        self.death = properties[prop]
+                    if name == "nom" :
+                        self.familyname = properties[prop]
+                    if name == "prenom" :
+                        self.firstname = properties[prop]
             return proprietes
         #return properties
         else:
             print(f"Erreur lors de la récupération des propriétés : {response.status_code}")
             return None
 
-
 def find_id(name):
     """Récupère l'id d'un compositeur à partir de son nom"""
-    url = f"https://www.wikidata.org/w/index.php?search={name[0]}+{name[1]}&title=Special%3ASearch&ns0=1&ns120=1"
+    if type(name)!=str:
+        strbool = False
+        url = f"https://www.wikidata.org/w/index.php?search={name[0]}+{name[-1]}&title=Special%3ASearch&ns0=1&ns120=1"
+    else:
+        strbool = True
+        url = f"https://www.wikidata.org/w/index.php?search={name}&title=Special%3ASearch&ns0=1&ns120=1"
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
     try :
@@ -115,15 +133,7 @@ def find_id(name):
         else:
             return group["href"][6:]
     except:
-        print(f"Erreur sur le nom {name[0]} {name[1]}")
-        return None
-
-
-
-class Oeuvre:
-    def __init__(self,titre,compositeur,genre,date,filename = None):
-        self.titre = titre
-        self.compositeur = compositeur
-        self.genre = genre
-        self.date = date
-        self.filename = filename
+        if strbool:
+            print(f"Erreur sur le nom {name}")
+            return None
+        print(f"Erreur sur le nom {name[0]} {name[-1]}")
