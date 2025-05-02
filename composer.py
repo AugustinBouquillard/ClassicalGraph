@@ -117,13 +117,3 @@ def find_id(name):
     except:
         print(f"Erreur sur le nom {name[0]} {name[1]}")
         return None
-
-
-
-class Oeuvre:
-    def __init__(self,titre,compositeur,genre,date,filename = None):
-        self.titre = titre
-        self.compositeur = compositeur
-        self.genre = genre
-        self.date = date
-        self.filename = filename
