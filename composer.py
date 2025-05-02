@@ -30,8 +30,19 @@ class Composer:
         self.description = desc
         self.influences = influences
 
-
+    """
     def __str__(self):
+        if self.name is not None:
+            return self.name
+        elif self.firstname is not None and self.familyname is not None :
+            return self.firstname+self.familyname
+        elif self.familyname is not None :
+            return self.familyname
+        else :
+            return self.id
+    """
+
+    def __repr__(self):
         if self.name is not None:
             return self.name
         elif self.firstname is not None and self.familyname is not None :
@@ -133,7 +144,7 @@ def find_id(name):
         url = f"https://www.wikidata.org/w/index.php?search={name[0]}+{name[-1]}&title=Special%3ASearch&ns0=1&ns120=1"
     else:
         strbool = True
-        name=name.replace("- Wikipedia","")
+        #name=name.replace("- Wikipedia","")
         url = f"https://www.wikidata.org/w/index.php?search={name}&title=Special%3ASearch&ns0=1&ns120=1"
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
@@ -153,34 +164,23 @@ def find_id(name):
         print(f"Erreur sur le nom {name[0]} {name[-1]}")
 
 
-def is_composer(id, name=None):
+def is_composer(id, name=None, get_the_dates_too=True):
     """détermine si l'id donné est celui d'un compositeur et si oui renvoie une instance de la classe Composer avec le bon id"""
-    """#name=name.split(" ")
-    #url = f"https://www.wikidata.org/w/index.php?search={name[0]}+{name[1]}&title=Special%3ASearch&ns0=1&ns120=1
-    url = f"https://www.wikidata.org/w/index.php?search={name}&title=Special%3ASearch&ns0=1&ns120=1"
-    page = requests.get(url)
-    soup = BeautifulSoup(page.content, "html.parser")
-    try :
-        bloc = soup.find("div", class_ = "mw-search-result-heading")
-        group = bloc.find("a")
-        if group is None:
-            return (False, -1)
-        else:
-            id=group["href"][6:]
-    except:
-        #print(f"Erreur sur le nom {name[0]} {name[1]}")
-        return (False, -1)
-    """
     sparql_endpoint = "https://query.wikidata.org/sparql"
     query = f"""
-    SELECT ?prop WHERE {{
+    SELECT ?prop ?bd ?dd WHERE {{
         wd:{id} wdt:P106 ?prop.
+        wd:{id} wdt:P569 ?bd.
+        wd:{id} wdt:P570 ?dd.
     }}
     """
     response = requests.get(sparql_endpoint, params={'query': query, 'format': 'json'})
     #time.sleep(0.05)
     #print(response.text)
     if "Q36834\"" in response.text:
+        if get_the_dates_too:
+            
+            return Composer(ID=id,nomcomplet=name,birth=bd,death=dd)
         return Composer(ID=id,nomcomplet=name)
     else:
         return None
