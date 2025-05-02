@@ -32,14 +32,14 @@ class Composer:
 
 
     def __str__(self):
-        if nomcomplet is not None:
-            return nomcomplet
-        elif prenom is not None and nom is not None :
-            return prenom+nom
-        elif nom is not None :
-            return nom
+        if self.name is not None:
+            return self.name
+        elif self.firstname is not None and self.familyname is not None :
+            return self.firstname+self.familyname
+        elif self.familyname is not None :
+            return self.familyname
         else :
-            return id
+            return self.id
 
     def set_attributes(self,lg="en"):
         entity_id = self.id
