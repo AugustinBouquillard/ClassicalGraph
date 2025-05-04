@@ -170,8 +170,8 @@ def is_composer(id, name=None, get_the_dates_too=True):
     query = f"""
     SELECT ?prop ?bd ?dd WHERE {{
         wd:{id} wdt:P106 ?prop.
-        wd:{id} wdt:P569 ?bd.
-        wd:{id} wdt:P570 ?dd.
+        OPTIONAL {{ wd:{id} wdt:P569 ?bd. }}
+        OPTIONAL {{ wd:{id} wdt:P570 ?dd. }}
     }}
     """
     response = requests.get(sparql_endpoint, params={'query': query, 'format': 'json'})
@@ -179,8 +179,11 @@ def is_composer(id, name=None, get_the_dates_too=True):
     #print(response.text)
     if "Q36834\"" in response.text:
         if get_the_dates_too:
-            
-            return Composer(ID=id,nomcomplet=name,birth=bd,death=dd)
+            #print(response.text)
+            data = response.json()
+            bd=data["results"]["bindings"][0]["bd"]["value"]
+            dd=data["results"]["bindings"][0]["dd"]["value"]
+            return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd)
         return Composer(ID=id,nomcomplet=name)
     else:
         return None
