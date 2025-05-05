@@ -156,8 +156,8 @@ def find_id(name):
         else:
             return group["href"][6:]
     except:
-        print(f"Erreur sur le nom {name[0]} {name[1]}")
-        return None
+        #print(f"Erreur sur le nom {name[0]} {name[1]}")
+        #return None
         if strbool:
             print(f"Erreur sur le nom {name}")
             return None
@@ -181,9 +181,14 @@ def is_composer(id, name=None, get_the_dates_too=True):
         if get_the_dates_too:
             #print(response.text)
             data = response.json()
-            bd=data["results"]["bindings"][0]["bd"]["value"]
-            dd=data["results"]["bindings"][0]["dd"]["value"]
-            return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd)
+            try :
+                bd=data["results"]["bindings"][0]["bd"]["value"]
+                dd=data["results"]["bindings"][0]["dd"]["value"]
+                return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd)
+            except :
+                print(f"no birth date or no death date for {name}")
+                return Composer(ID=id,nomcomplet=name)
+
         return Composer(ID=id,nomcomplet=name)
     else:
         return None
