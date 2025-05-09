@@ -100,13 +100,19 @@ def orienting_with_dates(list_of_dico,compo_dico={}):
                 if d and birth_date is not None:
                     if birth_date > death_date_compo-20:#if compo died at most 2O years after the birth of c then we assume only compo could influence c and not the other way around
                         compo_dico[compo.id].influences.add(c)
+                    elif b and death_date is not None:
+                        if death_date < birth_date_compo+20:#if the current composer c died at most 20 years after the birth of compo we assume compo could not influence c and that only c influenced compo
+                            compo_dico[c.id].influences.add(compo)
                     else:
                         compo_dico[compo.id].influences.add(c)
-                        compo[c.id].influences.add(c)
+                        compo_dico[c.id].influences.add(c)
 
                 elif b and death_date is not None:
                         if death_date < birth_date_compo+20:#if the current composer c died at most 20 years after the birth of compo we assume compo could not influence c and that only c influenced compo
                             compo_dico[c.id].influences.add(compo)
+                        #elif d and birth_date is not None:
+                        #    if birth_date > death_date_compo-20:#if compo died at most 2O years after the birth of c then we assume only compo could influence c and not the other way around
+                        #        compo_dico[compo.id].influences.add(c)
                         else:
                             compo_dico[compo.id].influences.add(c)
                             compo_dico[c.id].influences.add(c)
@@ -133,5 +139,6 @@ def graph_of_influences(list_of_compo_names,fr=True):
     return build_graph_from_dict(compo_dico)
 
 
-G=graph_of_influences(["Henri Duparc","Gabriel Dupont","Jean Cras"],True)
+#G=graph_of_influences(["Henri Duparc","Gabriel Dupont","Jean Cras"],True)
+G=graph_of_influences(["Jean Perrin"])
 nx.draw(G, with_labels=True)#, labels = nx.get_node_attributes(graph, 'nom complet'))
