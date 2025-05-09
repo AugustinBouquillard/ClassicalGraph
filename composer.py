@@ -10,7 +10,7 @@ import json
 from ipysigma import Sigma
 
 class Composer:
-    def __init__(self,ID="Q36834",nomcomplet=None,nom=None,prenom=None,naissance=None,mort=None,desc=None,influences = []):
+    def __init__(self,ID="Q36834",nomcomplet=None,nom=None,prenom=None,naissance=None,mort=None,desc=None,pays=None, influences = set()):
         if ID=="Q36834":
             if prenom is not None and nom is not None:
                 self.id=find_id((prenom,nom))
@@ -28,6 +28,7 @@ class Composer:
         self.birth = naissance
         self.death = mort
         self.description = desc
+        self.country = pays
         self.influences = influences
 
     """
@@ -168,10 +169,12 @@ def is_composer(id, name=None, get_the_dates_too=True):
     """détermine si l'id donné est celui d'un compositeur et si oui renvoie une instance de la classe Composer avec le bon id"""
     sparql_endpoint = "https://query.wikidata.org/sparql"
     query = f"""
-    SELECT ?prop ?bd ?dd WHERE {{
+    SELECT ?prop ?bd ?dd ?ct ?pu WHERE {{
         wd:{id} wdt:P106 ?prop.
         OPTIONAL {{ wd:{id} wdt:P569 ?bd. }}
         OPTIONAL {{ wd:{id} wdt:P570 ?dd. }}
+        OPTIONAL {{ wd:{id} wdt:P27 ?ct.  }}
+        OPTIONAL {{ wd:{id} wdt:P802 ?pu. }}
     }}
     """
     response = requests.get(sparql_endpoint, params={'query': query, 'format': 'json'})
@@ -180,14 +183,37 @@ def is_composer(id, name=None, get_the_dates_too=True):
     if "Q36834\"" in response.text:
         if get_the_dates_too:
             #print(response.text)
+            #b,d = True,True
             data = response.json()
             try :
-                bd=data["results"]["bindings"][0]["bd"]["value"]
-                dd=data["results"]["bindings"][0]["dd"]["value"]
-                return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd)
+                bd=int(data["results"]["bindings"][0]["bd"]["value"].split("-")[0].strip())
             except :
-                print(f"no birth date or no death date for {name}")
-                return Composer(ID=id,nomcomplet=name)
+                #b=False
+                bd=None
+                print(f"no valid birth date for {name}")
+            try :
+                dd=int(data["results"]["bindings"][0]["dd"]["value"].split("-")[0].strip())
+            except :
+                #d=False
+                dd=None
+                print(f"no valid death date for {name}")
+            try :
+                ct = data["results"]["bindings"][0]["ct"]["value"]
+            except :
+                ct = None
+
+            influ = set()
+            try :
+                pu = re.split(r'[;,\s]+', data["results"]["bindings"][0]["pu"]["value"])
+                print(pu)
+                for p in pu:
+                    c = is_composer(p)
+                    if c is not None :
+                        influ.add(c)
+            except :
+                return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct)
+
+            return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct,influences=influ)
 
         return Composer(ID=id,nomcomplet=name)
     else:
