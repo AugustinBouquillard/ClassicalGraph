@@ -27,9 +27,9 @@ def get_wikipedia_page_text(name,language="en"):
     page = requests.get(url)
     soup = BeautifulSoup(page.content, "html.parser")
     text=soup.get_text()
-    if language =="en" and name+" - Wikipedia" in text:
+    if language =="en" and (name+" - Wikipedia" in text or name.split(" ")[-1]+" - Wikipedia" in text):
         return get_wikipedia_page_text(name+" (composer)")
-    elif language=="fr" and name+" - Wikipédia" in text:
+    elif language=="fr" and (name+" - Wikipédia" in text or name.split(" ")[-1]+" - Wikipédia" in text):
         return get_wikipedia_page_text(naem+" (compositeur)")
     return text
 
