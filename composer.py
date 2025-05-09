@@ -165,8 +165,8 @@ def find_id(name):
         print(f"Erreur sur le nom {name[0]} {name[-1]}")
 
 
-def is_composer(id, name=None, get_the_dates_too=True):
-    """détermine si l'id donné est celui d'un compositeur et si oui renvoie une instance de la classe Composer avec le bon id"""
+def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
+    """détermine si l'id donné est celui d'un compositeur et si oui renvoie une instance de la classe Composer avec le bon id et certains de ses ttributs"""
     sparql_endpoint = "https://query.wikidata.org/sparql"
     query = f"""
     SELECT ?prop ?bd ?dd ?ct ?pu WHERE {{
@@ -181,6 +181,10 @@ def is_composer(id, name=None, get_the_dates_too=True):
     #time.sleep(0.05)
     #print(response.text)
     if "Q36834\"" in response.text:
+        bd=None
+        dd=None
+        ct=None
+        influ = set()
         if get_the_dates_too:
             #print(response.text)
             #b,d = True,True
@@ -189,34 +193,45 @@ def is_composer(id, name=None, get_the_dates_too=True):
                 bd=int(data["results"]["bindings"][0]["bd"]["value"].split("-")[0].strip())
             except :
                 #b=False
-                bd=None
+                #bd=None
                 print(f"no valid birth date for {name}")
             try :
                 dd=int(data["results"]["bindings"][0]["dd"]["value"].split("-")[0].strip())
             except :
                 #d=False
-                dd=None
+                #dd=None
                 print(f"no valid death date for {name}")
             try :
                 ct = data["results"]["bindings"][0]["ct"]["value"]
             except :
                 ct = None
-
-            influ = set()
+        if get_the_pupils :
             try :
-                pu = re.split(r'[;,\s]+', data["results"]["bindings"][0]["pu"]["value"])
-                print(pu)
-                for p in pu:
-                    c = is_composer(p)
+                #pu = re.split(r'[;,\s]+', data["results"]["bindings"][0]["pu"]["value"])
+                #print("trying to get the pupils")
+                for j in range(len(data["results"]["bindings"])):
+                    #print("inside the loop")
+                    pu = data["results"]["bindings"][j]["pu"]["value"].split("entity/")[-1]
+                    #print(pu)
+                    c = is_composer(pu,get_the_pupils=False)
+                    #print(c)
                     if c is not None :
                         influ.add(c)
+                #print(name,influ)
+                #print(pu)
+                #print(len(pu)//2)
+                """for p in [pu[(i*2)+1] for i in range(len(pu)//2)]:
+                    #print(p)
+                    c = is_composer(p,get_the_pupils=False)
+                    if c is not None :
+                        influ.add(c)
+                print(influ)"""
             except :
                 return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct)
 
-            return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct,influences=influ)
+        return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct,influences=influ)
 
-        return Composer(ID=id,nomcomplet=name)
-    else:
+    else:#this guy is not a composer
         return None
 #getting the wikidata ID from a given wikipedia page
 #"https://en.wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item&redirects=1&titles=ARTICLE_NAME"
