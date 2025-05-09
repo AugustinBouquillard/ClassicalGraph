@@ -7,7 +7,7 @@ import numpy as np
 import time
 import pickle
 import json
-from ipysigma import Sigma
+#from ipysigma import Sigma
 from composer import *
 
 
