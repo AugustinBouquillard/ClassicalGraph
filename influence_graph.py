@@ -44,7 +44,7 @@ def composer_filter(list_of_names):
     compo_dico={}
     for n in list_of_names:
         c_id = find_id(n)
-        if c_id not in compo_dico:
+        if c_id is not None and c_id not in compo_dico:
             c = is_composer(c_id,n)
             #print(is_composer(n))
             if c is not None :
@@ -130,7 +130,7 @@ def build_graph_from_dict(compo_dico,G=nx.DiGraph()):
         for c in compo.influences:
             G.add_edge(compo,c)
     # save graph object to file
-    pickle.dump(G, open(str(compo_dico.keys())+".pickle", 'wb'))
+    pickle.dump(G, open(str(next(iter(compo_dico.keys())))+".pickle", 'wb'))
     return G
 
 def graph_of_influences(list_of_compo_names,fr=True):
@@ -139,6 +139,6 @@ def graph_of_influences(list_of_compo_names,fr=True):
     return build_graph_from_dict(compo_dico)
 
 
-#G=graph_of_influences(["Henri Duparc","Gabriel Dupont","Jean Cras"],True)
-G=graph_of_influences(["Jean Perrin"])
-nx.draw(G, with_labels=True)#, labels = nx.get_node_attributes(graph, 'nom complet'))
+G=graph_of_influences(["César Franck","Henri Duparc","Jean Cras","Charles-Marie Widor","Louis Vierne","Alexandre Guilmant","Marcel Dupré","Eugène Gigout","Jehan Alain","Charles Tournemire","Gabriel Dupont","Déodat de Séverac","Vincent d'Indy","Albert Roussel","Olivier Messiaen","Pierre Boulez", "Naji Hakim","Edgar Varèse", "Tristan Murail","Iannis Xenakis","Gérard Grisey","Claude Debussy","Maurice Ravel","Gabriel Fauré","Reynaldo Hahn","Gustave Samazeuilh","Paul Ladmirault","Paul Le Flem","Philippe Hersant","Maurice Duruflé","Thierry Escaich","Yves Castagnet","Eric Lebrun","Jean-Philippe Rameau","Louis Couperin","Claude Balbastre","Arthur Honegger","George Auric","Francis Poulenc","Germaine Taillefer","Darius Milhaud","Louis Durey","Guy Ropartz","Henri Rabaud","Sylvio Lazzari","Louis Aubert","Charles Munch","Hector Berlioz","André Caplet","André Jolivet","André Messager","Yves Baudrier","Erik Satie"],True)
+#G=graph_of_influences(["Jean Perrin"])
+#nx.draw(G, with_labels=True)#, labels = nx.get_node_attributes(graph, 'nom complet'))
