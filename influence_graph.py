@@ -68,55 +68,55 @@ def build_list_of_influences(enum_of_composers,french=False):
 
 
 def orienting_with_dates(list_of_dico,compo_dico={}):
-"""completing the influences of all encountered compsoers; orienting the influence relations when no doubt exists because of birth-death dates"""
+    """completing the influences of all encountered compsoers; orienting the influence relations when no doubt exists because of birth-death dates"""
 
-for dico in list_of_dico:
-    cpt=0
-    b=False #boolean equal to True iff we have access the the birth date of the first composer
-    d=False #boolean equal to True iff we have access the the death date of the first composer
-    for c in dico.values():
+    for dico in list_of_dico:
+        cpt=0
+        b=False #boolean equal to True iff we have access the the birth date of the first composer
+        d=False #boolean equal to True iff we have access the the death date of the first composer
+        for c in dico.values():
 
-        if c.id not in compo_dico :
-            compo_dico[c.id]=c
+            if c.id not in compo_dico :
+                compo_dico[c.id]=c
 
-        if cpt==0: #the first element of each dictionary is the one whose wikipedia page was used to retrieve all the others present in the current dictionary
-            compo = compo_dico[c.id]
-            birth_date_compo = compo.birth
-            death_date_compo = compo.death
-            if birth_date_compo is not None :
-                print("db:"+str(c.birth))
-                b = True
+            if cpt==0: #the first element of each dictionary is the one whose wikipedia page was used to retrieve all the others present in the current dictionary
+                compo = compo_dico[c.id]
+                birth_date_compo = compo.birth
+                death_date_compo = compo.death
+                if birth_date_compo is not None :
+                    print("db:"+str(c.birth))
+                    b = True
 
-            if death_date_compo is not None :
-                print("dd:"+str(c.death))
-                d = True
+                if death_date_compo is not None :
+                    print("dd:"+str(c.death))
+                    d = True
 
-            cpt+=1
+                cpt+=1
 
-        else :
-            birth_date = c.birth
-            death_date = c.death
+            else :
+                birth_date = c.birth
+                death_date = c.death
 
-            if d and birth_date is not None:
-                if birth_date > death_date_compo-20:#if compo died at most 2O years after the birth of c then we assume only compo could influence c and not the other way around
-                    compo_dico[compo.id].influences.add(c)
-                else:
-                    compo_dico[compo.id].influences.add(c)
-                    compo[c.id].influences.add(c)
-
-            elif b and death_date is not None:
-                    if death_date < birth_date_compo+20:#if the current composer c died at most 20 years after the birth of compo we assume compo could not influence c and that only c influenced compo
-                        compo_dico[c.id].influences.add(compo)
+                if d and birth_date is not None:
+                    if birth_date > death_date_compo-20:#if compo died at most 2O years after the birth of c then we assume only compo could influence c and not the other way around
+                        compo_dico[compo.id].influences.add(c)
                     else:
                         compo_dico[compo.id].influences.add(c)
-                        compo_dico[c.id].influences.add(c)
+                        compo[c.id].influences.add(c)
 
-            else:#we cannot say anything for sure since they were contemporary so by default we assume they influenced each other
-                compo_dico[compo.id].influences.add(c)
-                compo_dico[c.id].influences.add(compo)
+                elif b and death_date is not None:
+                        if death_date < birth_date_compo+20:#if the current composer c died at most 20 years after the birth of compo we assume compo could not influence c and that only c influenced compo
+                            compo_dico[c.id].influences.add(compo)
+                        else:
+                            compo_dico[compo.id].influences.add(c)
+                            compo_dico[c.id].influences.add(c)
+
+                else:#we cannot say anything for sure since they were contemporary so by default we assume they influenced each other
+                    compo_dico[compo.id].influences.add(c)
+                    compo_dico[c.id].influences.add(compo)
 
 
-return compo_dico
+    return compo_dico
 
 
 def build_graph_from_dict(compo_dico,G=nx.DiGraph()):
