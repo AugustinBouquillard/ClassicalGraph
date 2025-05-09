@@ -209,15 +209,18 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
             try :
                 #pu = re.split(r'[;,\s]+', data["results"]["bindings"][0]["pu"]["value"])
                 #print("trying to get the pupils")
+                pu=""
                 for j in range(len(data["results"]["bindings"])):
                     #print("inside the loop")
+                    previouspu = pu
                     pu = data["results"]["bindings"][j]["pu"]["value"].split("entity/")[-1]
-                    #print(pu)
-                    c = is_composer(pu,get_the_pupils=False)
-                    #print(c)
-                    if c is not None :
-                        influ.add(c)
-                #print(name,influ)
+                    if previouspu != pu:
+                        #print(pu)
+                        c = is_composer(pu,get_the_pupils=False)
+                        #print(c)
+                        if c is not None :
+                            influ.add(c)
+                print(name,influ)
                 #print(pu)
                 #print(len(pu)//2)
                 """for p in [pu[(i*2)+1] for i in range(len(pu)//2)]:
