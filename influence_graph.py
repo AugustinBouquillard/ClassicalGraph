@@ -30,7 +30,7 @@ def get_wikipedia_page_text(name,language="en"):
     if language =="en" and (name+" - Wikipedia" in text or name.split(" ")[-1]+" - Wikipedia" in text):
         return get_wikipedia_page_text(name+" (composer)")
     elif language=="fr" and (name+" - Wikipédia" in text or name.split(" ")[-1]+" - Wikipédia" in text):
-        return get_wikipedia_page_text(naem+" (compositeur)")
+        return get_wikipedia_page_text(name+" (compositeur)")
     return text
 
 def composer_filter_by_dict(list_of_names, dico):
@@ -139,6 +139,7 @@ def graph_of_influences(list_of_compo_names,fr=True):
     return build_graph_from_dict(compo_dico)
 
 
-G=graph_of_influences(["César Franck","Henri Duparc","Jean Cras","Charles-Marie Widor","Louis Vierne","Alexandre Guilmant","Marcel Dupré","Eugène Gigout","Jehan Alain","Charles Tournemire","Gabriel Dupont","Déodat de Séverac","Vincent d'Indy","Albert Roussel","Olivier Messiaen","Pierre Boulez", "Naji Hakim","Edgar Varèse", "Tristan Murail","Iannis Xenakis","Gérard Grisey","Claude Debussy","Maurice Ravel","Gabriel Fauré","Reynaldo Hahn","Gustave Samazeuilh","Paul Ladmirault","Paul Le Flem","Philippe Hersant","Maurice Duruflé","Thierry Escaich","Yves Castagnet","Eric Lebrun","Jean-Philippe Rameau","Louis Couperin","Claude Balbastre","Arthur Honegger","George Auric","Francis Poulenc","Germaine Taillefer","Darius Milhaud","Louis Durey","Guy Ropartz","Henri Rabaud","Sylvio Lazzari","Louis Aubert","Charles Munch","Hector Berlioz","André Caplet","André Jolivet","André Messager","Yves Baudrier","Erik Satie"],True)
+G1=graph_of_influences(["Paul Le Flem"])
+G2=graph_of_influences(["César Franck","Henri Duparc","Jean Cras","Charles-Marie Widor","Louis Vierne","Alexandre Guilmant","Marcel Dupré","Eugène Gigout","Jehan Alain","Charles Tournemire","Gabriel Dupont","Déodat de Séverac","Vincent d'Indy","Albert Roussel","Olivier Messiaen","Pierre Boulez", "Naji Hakim","Edgar Varèse", "Tristan Murail","Iannis Xenakis","Gérard Grisey","Claude Debussy","Maurice Ravel","Gabriel Fauré","Reynaldo Hahn","Gustave Samazeuilh","Paul Ladmirault","Paul Le Flem","Philippe Hersant","Maurice Duruflé","Thierry Escaich","Yves Castagnet","Eric Lebrun","Jean-Philippe Rameau","Louis Couperin","Claude Balbastre","Arthur Honegger","George Auric","Francis Poulenc","Germaine Taillefer","Darius Milhaud","Louis Durey","Guy Ropartz","Henri Rabaud","Sylvio Lazzari","Louis Aubert","Charles Munch","Hector Berlioz","André Caplet","André Jolivet","André Messager","Yves Baudrier","Erik Satie","Jules Massenet","Charles Gounod","Georges Bizet","Ernest Chausson","Jacques Offenbach","Étienne Nicolas Méhul","André Grétry","François-Joseph Gossec","Jean-François Lesueur","Adolphe Adam","François-Adrien Boieldieu","Léon Boëllmann","Camille Saint-Saëns","Florent Schmitt","Charles-Valentin Alkan","Ambroise Thomas","Alexandre-Pierre-François Boëly"],True)
 #G=graph_of_influences(["Jean Perrin"])
 #nx.draw(G, with_labels=True)#, labels = nx.get_node_attributes(graph, 'nom complet'))
