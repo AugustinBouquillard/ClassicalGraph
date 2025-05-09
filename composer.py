@@ -7,7 +7,7 @@ import numpy as np
 import time
 import pickle
 import json
-from ipysigma import Sigma
+#from ipysigma import Sigma
 
 class Composer:
     def __init__(self,ID="Q36834",nomcomplet=None,nom=None,prenom=None,naissance=None,mort=None,desc=None,pays=None, influences = set()):
