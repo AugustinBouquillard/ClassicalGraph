@@ -81,6 +81,7 @@ def orienting_with_dates(list_of_dico,compo_dico={}):
 
             if cpt==0: #the first element of each dictionary is the one whose wikipedia page was used to retrieve all the others present in the current dictionary
                 compo = compo_dico[c.id]
+                cpt+=1
                 print("1st composer of this page :",compo,compo.id,compo_dico[compo.id].influences)
                 birth_date_compo = compo.birth
                 death_date_compo = compo.death
@@ -92,8 +93,6 @@ def orienting_with_dates(list_of_dico,compo_dico={}):
                     print("dd:"+str(c.death))
                     d = True
 
-                cpt+=1
-
             else :
                 birth_date = c.birth
                 death_date = c.death
@@ -104,9 +103,13 @@ def orienting_with_dates(list_of_dico,compo_dico={}):
                     elif b and death_date is not None:
                         if death_date < birth_date_compo+20:#if the current composer c died at most 20 years after the birth of compo we assume compo could not influence c and that only c influenced compo
                             compo_dico[c.id].influences.add(compo)
+                        else:
+                            compo_dico[compo.id].influences.add(c)
+                            #print(f"added {c} to {compo_dico[compo.id]}")
+                            compo_dico[c.id].influences.add(compo)
                     else:
                         compo_dico[compo.id].influences.add(c)
-                        compo_dico[c.id].influences.add(c)
+                        compo_dico[c.id].influences.add(compo)
 
                 elif b and death_date is not None:
                         if death_date < birth_date_compo+20:#if the current composer c died at most 20 years after the birth of compo we assume compo could not influence c and that only c influenced compo
@@ -116,12 +119,12 @@ def orienting_with_dates(list_of_dico,compo_dico={}):
                         #        compo_dico[compo.id].influences.add(c)
                         else:
                             compo_dico[compo.id].influences.add(c)
-                            compo_dico[c.id].influences.add(c)
+                            compo_dico[c.id].influences.add(compo)
 
                 else:#we cannot say anything for sure since they were contemporary so by default we assume they influenced each other
                     compo_dico[compo.id].influences.add(c)
                     compo_dico[c.id].influences.add(compo)
-        print(compo_dico[compo.id].influences)
+        print(compo_dico[compo.id],compo_dico[compo.id].influences)
 
     return compo_dico
 
@@ -134,17 +137,18 @@ def build_graph_from_dict(compo_dico,G=nx.DiGraph()):
     pickle.dump(G, open(str(next(iter(compo_dico.keys())))+".pickle", 'wb'))
     return G
 
-def graph_of_influences(list_of_compo_names,fr=True,G=nx.DiGraph()):
+def graph_of_influences(list_of_compo_names,fr=True,Graph=nx.DiGraph()):
     list_of_influ_dicts=build_list_of_influences(list_of_compo_names,fr)#put false if you're only interested in the english wiki
     compo_dico = orienting_with_dates(list_of_influ_dicts)
-    return build_graph_from_dict(compo_dico,G)
+    return build_graph_from_dict(compo_dico,Graph)
 
 
 #G1=graph_of_influences(["Paul Le Flem"])
 #G3=graph_of_influences(["Iannis Xenakis"])
-#G2=graph_of_influences(["César Franck","Henri Duparc","Jean Cras","Charles-Marie Widor","Louis Vierne","Alexandre Guilmant","Marcel Dupré","Eugène Gigout","Jehan Alain","Charles Tournemire","Gabriel Dupont","Déodat de Séverac","Vincent d'Indy","Albert Roussel","Olivier Messiaen","Pierre Boulez", "Naji Hakim","Edgar Varèse", "Tristan Murail","Gérard Grisey","Claude Debussy","Maurice Ravel","Gabriel Fauré","Reynaldo Hahn","Gustave Samazeuilh","Paul Ladmirault","Paul Le Flem","Philippe Hersant","Maurice Duruflé","Thierry Escaich","Yves Castagnet","Eric Lebrun","Jean-Philippe Rameau","Louis Couperin","Claude Balbastre","Arthur Honegger","George Auric","Francis Poulenc","Germaine Taillefer","Darius Milhaud","Louis Durey","Guy Ropartz","Henri Rabaud","Sylvio Lazzari","Louis Aubert","Charles Munch","Hector Berlioz","André Caplet","André Jolivet","André Messager","Yves Baudrier","Erik Satie","Jules Massenet","Charles Gounod","Georges Bizet","Ernest Chausson","Jacques Offenbach","Étienne Nicolas Méhul","André Grétry","François-Joseph Gossec","Jean-François Lesueur","Adolphe Adam","François-Adrien Boieldieu","Léon Boëllmann","Camille Saint-Saëns","Florent Schmitt","Charles-Valentin Alkan","Ambroise Thomas","Alexandre-Pierre-François Boëly","Léo Delibes","Michel-Richard de Lalande","Marin Marais","Marc-Antoine Charpentier","Louis-Nicolas Clérambault","André Campra","Henry Desmarest","Nicolas de Grigny","Joseph Bologne de Saint-George","Jacques Ibert"],True)
-G=pickle.load(open("Q50187.pickle", 'rb'))
-G5=graph_of_influences(["Emmanuel Chabrier","Jacques Ibert","Louis Moreau Gottshalk","Léonin","Pérotin","Adam de la Halle","Philippe_de_Vitry","Guillaume de Machaut"],G)
+G2=graph_of_influences(["Gabriel Pierné","César Franck","Henri Duparc","Jean Cras","Charles-Marie Widor","Louis Vierne","Alexandre Guilmant","Marcel Dupré","Eugène Gigout","Jehan Alain","Charles Tournemire","Gabriel Dupont","Déodat de Séverac","Vincent d'Indy","Albert Roussel","Olivier Messiaen","Pierre Boulez", "Naji Hakim","Edgar Varèse", "Tristan Murail","Gérard Grisey","Claude Debussy","Maurice Ravel","Gabriel Fauré","Reynaldo Hahn","Gustave Samazeuilh","Paul Ladmirault","Paul Le Flem","Philippe Hersant","Maurice Duruflé","Thierry Escaich","Yves Castagnet","Eric Lebrun","Jean-Philippe Rameau","Louis Couperin","Claude Balbastre","Arthur Honegger","George Auric","Francis Poulenc","Germaine Taillefer","Darius Milhaud","Louis Durey","Guy Ropartz","Henri Rabaud","Sylvio Lazzari","Louis Aubert","Charles Munch","Hector Berlioz","André Caplet","André Jolivet","André Messager","Yves Baudrier","Erik Satie","Jules Massenet","Charles Gounod","Georges Bizet","Ernest Chausson","Jacques Offenbach","Étienne Nicolas Méhul","André Grétry","François-Joseph Gossec","Jean-François Lesueur","Adolphe Adam","François-Adrien Boieldieu","Léon Boëllmann","Camille Saint-Saëns","Florent Schmitt","Charles-Valentin Alkan","Ambroise Thomas","Alexandre-Pierre-François Boëly","Léo Delibes","Michel-Richard de Lalande","Marin Marais","Marc-Antoine Charpentier","Louis-Nicolas Clérambault","André Campra","Henry Desmarest","Nicolas de Grigny","Joseph Bologne de Saint-George","Jacques Ibert"],True)
+G=pickle.load(open("Q433749.pickle", 'rb'))
+print("number of nodes in initial G :",G.number_of_nodes())
+G5=graph_of_influences(["Emmanuel Chabrier","Jacques Ibert","Louis Moreau Gottshalk","Léonin","Pérotin","Adam de la Halle","Philippe_de_Vitry","Guillaume de Machaut"],True,Graph=G)
 #G4=graph_of_influences(["Mozart","Jean Sebastien Bach","Beethoven","Wagner"],G)
 #G=graph_of_influences(["Jean Perrin"])
 #nx.draw(G, with_labels=True)#, labels = nx.get_node_attributes(graph, 'nom complet'))
