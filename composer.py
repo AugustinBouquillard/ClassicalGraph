@@ -180,7 +180,7 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
     response = requests.get(sparql_endpoint, params={'query': query, 'format': 'json'})
     #time.sleep(0.05)
     #print(response.text)
-    if "Q36834\"" in response.text:
+    if "Q36834\"" in response.text or "Q21680663" in response.text:
         bd=None
         dd=None
         ct=None
