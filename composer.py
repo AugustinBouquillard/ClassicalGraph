@@ -232,6 +232,7 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
             except :
                 return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct)
 
+        print("at the end of is_composer", name,id,"has influenced",influ)
         return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct,influences=influ)
 
     else:#this guy is not a composer
