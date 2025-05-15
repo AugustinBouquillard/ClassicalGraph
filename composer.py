@@ -180,7 +180,7 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
     response = requests.get(sparql_endpoint, params={'query': query, 'format': 'json'})
     #time.sleep(0.05)
     #print(response.text)
-    if "Q36834\"" in response.text:
+    if "Q36834\"" in response.text or "Q21680663" in response.text:
         bd=None
         dd=None
         ct=None
@@ -216,7 +216,7 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
                     pu = data["results"]["bindings"][j]["pu"]["value"].split("entity/")[-1]
                     if previouspu != pu:
                         #print(pu)
-                        c = is_composer(pu,get_the_pupils=False)
+                        c = is_composer(pu,get_the_pupils=False)#to be changed to True
                         #print(c)
                         if c is not None :
                             influ.add(c)
@@ -230,8 +230,10 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
                         influ.add(c)
                 print(influ)"""
             except :
-                return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct)
+                print("at the end of is_composer", name,id,"has influenced",influ,"no one since no pupil was found")
+                return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct,influences=influ)#for an unknown reason, a big bug was caused by the absence of influences=influ in this initialization - it should however have been set to set() by the constructor but it was set to the same list of influences than the one of the last treated compo (ie last name in the list of composers given at the beginning)
 
+        print("at the end of is_composer", name,id,"has influenced",influ)
         return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct,influences=influ)
 
     else:#this guy is not a composer
