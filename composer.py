@@ -8,10 +8,10 @@ import time
 import pickle
 import json
 #from ipysigma import Sigma
-
+DEFAULT_ID = "Q36834"
 class Composer:
-    def __init__(self,ID="Q36834",nomcomplet=None,nom=None,prenom=None,naissance=None,mort=None,desc=None,pays=None, influences = set()):
-        if ID=="Q36834":
+    def __init__(self,ID=DEFAULT_ID,nomcomplet=None,nom=None,prenom=None,naissance=None,mort=None,desc=None,pays=None, influences = set()):
+        if ID==DEFAULT_ID:
             if prenom is not None and nom is not None:
                 self.id=find_id((prenom,nom))
             elif nomcomplet is not None :
@@ -42,6 +42,22 @@ class Composer:
         else :
             return self.id
     """
+
+    def get_era(self):
+        if self.birth is None :
+            return "Unknown"
+        elif self.birth < 1570 and self.birth > 476:
+            return "Medieval"
+        elif self.birth < 1730:
+            return "Baroque"
+        elif self.birth < 1800:
+            return "Classique"
+        elif self.birth < 1860:
+            return "Romantique"
+        elif self.death is not None:
+            return "XXe"
+        else :
+            return "contemporain"
 
     def __repr__(self):
         if self.name is not None:
