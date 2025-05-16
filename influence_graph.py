@@ -177,7 +177,7 @@ G=pickle.load(open("Q50187.pickle", 'rb'))
 #G2=graph_of_influences(["Emmanuel Chabrier","Jacques Ibert","Louis Moreau Gottshalk","Léonin","Pérotin","Adam de la Halle","Guillaume de Machaut","Philippe_de_Vitry","Clément Janequin","Jean-Jacques Rousseau"],True,G)
 
 
-
-G5=graph_of_influences(["Jacopo Peri","Monteverdi","Domenico Scarlatti","Vivaldi","Jean Sebastien Bach","Purcell","Carl Philip Emmanuel Bach","Joseph Haydn","Wolfgang Amadeus Mozart","Czerny","Ludwig van Beethoven","Carl Maria von Weber","John Field","Franz Schubert","Donizetti","Bellini","Robert Schumann","Stephen Heller","Rossini","Verdi","Brahms","Richard Wagner","Puccini","Scriabin","Rachmaninov","Stravinsky","George Gershwin","Arnold Schoenberg","Bela Bartok","Alban Berg","Webern","Schostakovitch","Stockhausen","Iannis Xenakis","Benjamin Britten","George Crumb","John Cage","Helmut Lachenmann","Harrison Birtwistle"],True,G)
+G_cross_era_small_composer_dataset = ["Jean Sebastien Bach","Beethoven","Brahms","Dvorak","Haendel","Joseph Haydn","Felix Mendelssohn","Mozart","Rameau","Schubert","Chostakovitch"]
+#G5=graph_of_influences(["Jacopo Peri","Monteverdi","Domenico Scarlatti","Vivaldi","Jean Sebastien Bach","Purcell","Carl Philip Emmanuel Bach","Joseph Haydn","Wolfgang Amadeus Mozart","Czerny","Ludwig van Beethoven","Carl Maria von Weber","John Field","Franz Schubert","Donizetti","Bellini","Robert Schumann","Stephen Heller","Rossini","Verdi","Brahms","Richard Wagner","Puccini","Scriabin","Rachmaninov","Stravinsky","George Gershwin","Arnold Schoenberg","Bela Bartok","Alban Berg","Webern","Schostakovitch","Stockhausen","Iannis Xenakis","Benjamin Britten","George Crumb","John Cage","Helmut Lachenmann","Harrison Birtwistle"],True,G)
 #G=graph_of_influences(["Jean Perrin"])
 #nx.draw(G, with_labels=True)#, labels = nx.get_node_attributes(graph, 'nom complet'))
