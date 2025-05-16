@@ -172,12 +172,14 @@ def graph_of_influences(list_of_compo_names,fr=True,G=nx.DiGraph()):
 #G4=graph_of_influences(["Iannis Xenakis"])
 
 #G1=graph_of_influences(["César Franck","Gabriel Pierné","Henri Duparc","Jean Cras","Charles-Marie Widor","Louis Vierne","Alexandre Guilmant","Marcel Dupré","Eugène Gigout","Jehan Alain","Charles Tournemire","Gabriel Dupont","Déodat de Séverac","Vincent d'Indy","Albert Roussel","Olivier Messiaen","Pierre Boulez", "Naji Hakim","Edgar Varèse", "Tristan Murail","Gérard Grisey","Claude Debussy","Maurice Ravel","Gabriel Fauré","Reynaldo Hahn","Gustave Samazeuilh","Paul Ladmirault","Paul Le Flem","Philippe Hersant","Maurice Duruflé","Thierry Escaich","Yves Castagnet","Eric Lebrun","Jean-Philippe Rameau","Louis Couperin","Claude Balbastre","Arthur Honegger","George Auric","Francis Poulenc","Germaine Taillefer","Darius Milhaud","Louis Durey","Guy Ropartz","Henri Rabaud","Sylvio Lazzari","Louis Aubert","Charles Munch","Hector Berlioz","André Caplet","André Jolivet","André Messager","Yves Baudrier","Erik Satie","Jules Massenet","Charles Gounod","Georges Bizet","Ernest Chausson","Jacques Offenbach","Étienne Nicolas Méhul","André Grétry","François-Joseph Gossec","Jean-François Lesueur","Adolphe Adam","François-Adrien Boieldieu","Léon Boëllmann","Camille Saint-Saëns","Florent Schmitt","Charles-Valentin Alkan","Ambroise Thomas","Alexandre-Pierre-François Boëly","Léo Delibes","Michel-Richard de Lalande","Marin Marais","Marc-Antoine Charpentier","Louis-Nicolas Clérambault","André Campra","Henry Desmarest","Nicolas de Grigny","Joseph Bologne de Saint-George","Jacques Ibert"],True)
-G=pickle.load(open("Q50187.pickle", 'rb'))
+#G=pickle.load(open("Q50187.pickle", 'rb'))
 #print("number of nodes in initial G :",G.number_of_nodes())
 #G2=graph_of_influences(["Emmanuel Chabrier","Jacques Ibert","Louis Moreau Gottshalk","Léonin","Pérotin","Adam de la Halle","Guillaume de Machaut","Philippe_de_Vitry","Clément Janequin","Jean-Jacques Rousseau"],True,G)
-
-
-G_cross_era_small_composer_dataset = ["Jean Sebastien Bach","Beethoven","Brahms","Dvorak","Haendel","Joseph Haydn","Felix Mendelssohn","Mozart","Rameau","Schubert","Chostakovitch"]
 #G5=graph_of_influences(["Jacopo Peri","Monteverdi","Domenico Scarlatti","Vivaldi","Jean Sebastien Bach","Purcell","Carl Philip Emmanuel Bach","Joseph Haydn","Wolfgang Amadeus Mozart","Czerny","Ludwig van Beethoven","Carl Maria von Weber","John Field","Franz Schubert","Donizetti","Bellini","Robert Schumann","Stephen Heller","Rossini","Verdi","Brahms","Richard Wagner","Puccini","Scriabin","Rachmaninov","Stravinsky","George Gershwin","Arnold Schoenberg","Bela Bartok","Alban Berg","Webern","Schostakovitch","Stockhausen","Iannis Xenakis","Benjamin Britten","George Crumb","John Cage","Helmut Lachenmann","Harrison Birtwistle"],True,G)
+
+G_cross_era_small_composer_dataset = graph_of_influences(["Jean Sebastien Bach","Beethoven","Brahms","Dvorak","Haendel","Joseph Haydn","Felix Mendelssohn","Mozart","Rameau","Schubert","Chostakovitch"],True)
+
 #G=graph_of_influences(["Jean Perrin"])
+
+
 #nx.draw(G, with_labels=True)#, labels = nx.get_node_attributes(graph, 'nom complet'))
