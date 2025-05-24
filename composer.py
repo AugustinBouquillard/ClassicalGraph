@@ -257,7 +257,7 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
 """
                 
             
-def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
+def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True,lg="fr"):
     """determine si l'id donné est celui d'un compositeur et si oui renvoie une instance de la classe Composer avec le bon id et certains de ses attributs"""
     sparql_endpoint = "https://query.wikidata.org/sparql"
     query = f"""
@@ -267,7 +267,7 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
         OPTIONAL {{ wd:{id} wdt:P570 ?dd. }}
         OPTIONAL {{ wd:{id} wdt:P27 ?ct. }}
         OPTIONAL {{ wd:{id} wdt:P802 ?pu. }}
-        OPTIONAL {{ wd:{id} rdfs:label ?label. FILTER(LANG(?label) = "fr") }}
+        OPTIONAL {{ wd:{id} rdfs:label ?label. FILTER(LANG(?label) = "{lg}") }}
     }}
     """
     response = requests.get(sparql_endpoint, params={'query': query, 'format': 'json'})
@@ -293,13 +293,11 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
             except:
                 ct = None
 
-        # Get the name if it's missing
         if name is None:
             try:
                 name = data["results"]["bindings"][0]["label"]["value"]
             except:
-                name = id  # fallback to id if label not found
-
+                name = id  
         if get_the_pupils:
             try:
                 pu = ""
