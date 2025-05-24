@@ -180,11 +180,11 @@ def find_id(name):
             return None
         print(f"Erreur sur le nom {name[0]} {name[-1]}")
 
-
+"""
 def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
-    """détermine si l'id donné est celui d'un compositeur et si oui renvoie une instance de la classe Composer avec le bon id et certains de ses ttributs"""
+    \"""détermine si l'id donné est celui d'un compositeur et si oui renvoie une instance de la classe Composer avec le bon id et certains de ses attributs\"""
     sparql_endpoint = "https://query.wikidata.org/sparql"
-    query = f"""
+    query = f\"""
     SELECT ?prop ?bd ?dd ?ct ?pu WHERE {{
         wd:{id} wdt:P106 ?prop.
         OPTIONAL {{ wd:{id} wdt:P569 ?bd. }}
@@ -192,7 +192,7 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
         OPTIONAL {{ wd:{id} wdt:P27 ?ct.  }}
         OPTIONAL {{ wd:{id} wdt:P802 ?pu. }}
     }}
-    """
+    \"""
     response = requests.get(sparql_endpoint, params={'query': query, 'format': 'json'})
     #time.sleep(0.05)
     #print(response.text)
@@ -239,12 +239,12 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
                 print(name,influ)
                 #print(pu)
                 #print(len(pu)//2)
-                """for p in [pu[(i*2)+1] for i in range(len(pu)//2)]:
+                \"""for p in [pu[(i*2)+1] for i in range(len(pu)//2)]:
                     #print(p)
                     c = is_composer(p,get_the_pupils=False)
                     if c is not None :
                         influ.add(c)
-                print(influ)"""
+                print(influ)\"""
             except :
                 print("at the end of is_composer", name,id,"has influenced",influ,"no one since no pupil was found")
                 return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct,influences=influ)#for an unknown reason, a big bug was caused by the absence of influences=influ in this initialization - it should however have been set to set() by the constructor but it was set to the same list of influences than the one of the last treated compo (ie last name in the list of composers given at the beginning)
@@ -253,6 +253,72 @@ def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
         return Composer(ID=id,nomcomplet=name,naissance=bd,mort=dd,pays=ct,influences=influ)
 
     else:#this guy is not a composer
+        return None
+"""
+                
+            
+def is_composer(id, name=None, get_the_dates_too=True, get_the_pupils=True):
+    """determine si l'id donné est celui d'un compositeur et si oui renvoie une instance de la classe Composer avec le bon id et certains de ses attributs"""
+    sparql_endpoint = "https://query.wikidata.org/sparql"
+    query = f"""
+    SELECT ?prop ?bd ?dd ?ct ?pu ?label WHERE {{
+        wd:{id} wdt:P106 ?prop.
+        OPTIONAL {{ wd:{id} wdt:P569 ?bd. }}
+        OPTIONAL {{ wd:{id} wdt:P570 ?dd. }}
+        OPTIONAL {{ wd:{id} wdt:P27 ?ct. }}
+        OPTIONAL {{ wd:{id} wdt:P802 ?pu. }}
+        OPTIONAL {{ wd:{id} rdfs:label ?label. FILTER(LANG(?label) = "fr") }}
+    }}
+    """
+    response = requests.get(sparql_endpoint, params={'query': query, 'format': 'json'})
+
+    if "Q36834\"" in response.text or "Q21680663" in response.text:
+        bd = None
+        dd = None
+        ct = None
+        influ = set()
+        data = response.json()
+
+        if get_the_dates_too:
+            try:
+                bd = int(data["results"]["bindings"][0]["bd"]["value"].split("-")[0].strip())
+            except:
+                print(f"no valid birth date for {name}")
+            try:
+                dd = int(data["results"]["bindings"][0]["dd"]["value"].split("-")[0].strip())
+            except:
+                print(f"no valid death date for {name}")
+            try:
+                ct = data["results"]["bindings"][0]["ct"]["value"]
+            except:
+                ct = None
+
+        # Get the name if it's missing
+        if name is None:
+            try:
+                name = data["results"]["bindings"][0]["label"]["value"]
+            except:
+                name = id  # fallback to id if label not found
+
+        if get_the_pupils:
+            try:
+                pu = ""
+                for j in range(len(data["results"]["bindings"])):
+                    previouspu = pu
+                    pu = data["results"]["bindings"][j]["pu"]["value"].split("entity/")[-1]
+                    if previouspu != pu:
+                        c = is_composer(pu, get_the_pupils=False)
+                        if c is not None:
+                            influ.add(c)
+                print(name, influ)
+            except:
+                print("at the end of is_composer", name, id, "has influenced", influ, "no one since no pupil was found")
+                return Composer(ID=id, nomcomplet=name, naissance=bd, mort=dd, pays=ct, influences=influ)
+
+        print("at the end of is_composer", name, id, "has influenced", influ)
+        return Composer(ID=id, nomcomplet=name, naissance=bd, mort=dd, pays=ct, influences=influ)
+
+    else:
         return None
 #getting the wikidata ID from a given wikipedia page
 #"https://en.wikipedia.org/w/api.php?action=query&prop=pageprops&ppprop=wikibase_item&redirects=1&titles=ARTICLE_NAME"
