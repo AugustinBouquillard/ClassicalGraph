@@ -38,6 +38,16 @@ def process_all_files(input_folder, output_folder):
             print(f"Processing folder: {sous_dossier_path}")
             process_audio_folder(sous_dossier_path, output_sous_dossier)
 
+def process_all_all_files(input_folder, output_folder):
+    os.makedirs(output_folder, exist_ok=True)
+    audio_extensions = ('.mp3', '.wav', '.flac', '.ogg', '.m4a')
+    for racine, sous_dossiers, _ in os.walk(input_folder):
+            for sous_dossier in sous_dossiers:
+                print(f"Processing folder: {sous_dossier}")
+                input_audio_path = os.path.join(racine, sous_dossier)
+                output_csv_path = os.path.join(output_folder, sous_dossier)
+                process_all_files(input_audio_path, output_csv_path)
+
 # if __name__ == "__main__":
 #     input_audio = r"C:\Users\PCAJM\ClassicalGraph\audiofiles\Beethoven_symphonie_8_allegro_vivace_con_brio.mp3"
 #     output_csv = r"C:\Users\PCAJM\ClassicalGraph\audiofiles\csv\coucou24.csv"
@@ -50,7 +60,12 @@ def process_all_files(input_folder, output_folder):
     
 #     process_all_files(input_folder, output_folder)
 
+# if __name__ == "__main__":
+#     input_folder = r"C:\Users\PCAJM\ClassicalGraph\audiofiles\100ClassicalMusicMasterpieces"
+#     output_folder = r"C:\Users\PCAJM\ClassicalGraph\audiofiles\100ClassicalMusicMasterpieces_csv"
+#     process_audio_folder(input_folder, output_folder)
+
 if __name__ == "__main__":
-    input_folder = r"C:\Users\PCAJM\ClassicalGraph\audiofiles\100ClassicalMusicMasterpieces"
-    output_folder = r"C:\Users\PCAJM\ClassicalGraph\audiofiles\100ClassicalMusicMasterpieces_csv"
-    process_audio_folder(input_folder, output_folder)
+    input_folder = r"C:\Users\PCAJM\ClassicalGraph\audiofiles\classicalsde"
+    output_folder = r"C:\Users\PCAJM\ClassicalGraph\audiofiles\classicalsde_csv"
+    process_all_all_files(input_folder, output_folder)
