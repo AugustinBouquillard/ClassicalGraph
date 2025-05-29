@@ -232,7 +232,7 @@ class BulkPreprocessing:
         groupe = []
         for file, histograms in dico_cross_era_sup.items():
             composer = compo_dict[file]
-            etiquettes.append(file)
+            etiquettes.append(file.split("\\")[-2] + '\\' + file.split('\\')[-1])
             matrice = np.vstack(histograms)
             X.append(matrice.flatten())
             y.append(composer)
@@ -251,22 +251,24 @@ class BulkPreprocessing:
         morceaux = np.array(etiquettes)
 
         compteur = Counter(y)
-        indices_a_garder = [i for i, label in enumerate(y) if compteur[label] > 1]
+        indices_a_garder = [i for i, label in enumerate(y) if compteur[label] > 1 or label.startswith("Traditional")]
+        western_only = [i for i, label in enumerate(y) if not label.startswith("Traditional")]
 
         X2 = X_scaled[indices_a_garder]
         y2 = y[indices_a_garder]
+        X3 = X_scaled[western_only]
         groupe = [groupe[i] for i in indices_a_garder]
         etiquettes = [etiquettes[i] for i in indices_a_garder]
 
         reducer = LDA(n_components=3)
         reducer.fit(X2,y2)
-        X_lda = reducer.transform(X_scaled)
+        X_lda = reducer.transform(X3)
         print(f"X_lda : {X_lda}")
 
         df_lda = pd.DataFrame(X_lda, columns=['LD1', 'LD2', 'LD3'])
-        df_lda['composer'] = y
-        df_lda['morceau'] = morceaux
-        df_lda['groupe'] = periodes
+        df_lda['composer'] = y[western_only]
+        df_lda['morceau'] = morceaux[western_only]
+        df_lda['groupe'] = periodes[western_only]
 
         fig = px.scatter_3d(
             df_lda,
@@ -292,90 +294,106 @@ class BulkPreprocessing:
         )
         fig.show()
 
-        def test(self):
-            with open(self.picklefile, "rb") as f:
-                dico_cross_era_sup, grouping_dict = pickle.load(f)
-            X = []
-            etiquettes = []
-            y = []
-            groupe = []
-            for file, histograms in dico_cross_era_sup.items():
-                composer = BulkPreprocessing.get_composer_audio_dir(file)
-                etiquettes.append(file)
-                matrice = np.vstack(histograms)
-                X.append(matrice.flatten())
-                y.append(composer)
-                groupe.append(grouping_dict[file])
+    def test(self):
+        with open(self.picklefile, "rb") as f:
+            dico_cross_era_sup, grouping_dict = pickle.load(f)
+        X = []
+        etiquettes = []
+        y = []
+        groupe = []
+        for file, histograms in dico_cross_era_sup.items():
+            composer = BulkPreprocessing.get_composer_audio_dir(file)
+            etiquettes.append(file)
+            matrice = np.vstack(histograms)
+            X.append(matrice.flatten())
+            y.append(composer)
+            groupe.append(grouping_dict[file])
 
-            # with open(self.picklefile2, "rb") as f:
-            #     dico_cross_era_2 = pickle.load(f)
-            # for file, histograms in dico_cross_era_2.items():
-            #     composer, date = BulkPreprocessing.get_data_audio_dir2(file)
-            #     etiquettes.append(file)
-            #     matrice = np.vstack(histograms)
-            #     X.append(matrice.flatten())
-            #     y.append(composer)
-            #     groupe.append(date)
+        with open(self.picklefile2, "rb") as f:
+            dico_cross_era_2 = pickle.load(f)
+        for file, histograms in dico_cross_era_2.items():
+            composer, date = BulkPreprocessing.get_data_audio_dir2(file)
+            etiquettes.append(file)
+            matrice = np.vstack(histograms)
+            X.append(matrice.flatten())
+            y.append(composer)
+            groupe.append(date)
 
-            X = np.array(X)
-            print(f"Shape de X : {X.shape}")
-            print(f"Shape de y : {len(y)}")
-            print(f"Nombre de compositeurs : {len(set(y))}")
-            print(f"Shape de groupe : {len(groupe)}")
-            print("Comptage des classes :", pd.Series(y).value_counts())
-            print(f"X : {X}")
-            X_scaled = StandardScaler().fit_transform(X)
-            y = np.array(y)
-            periodes = np.array(groupe)
-            morceaux = np.array(etiquettes)
+        X = np.array(X)
+        print(f"Shape de X : {X.shape}")
+        print(f"Shape de y : {len(y)}")
+        print(f"Nombre de compositeurs : {len(set(y))}")
+        print(f"Shape de groupe : {len(groupe)}")
+        print("Comptage des classes :", pd.Series(y).value_counts())
+        print(f"X : {X}")
+        X_scaled = StandardScaler().fit_transform(X)
+        y = np.array(y)
+        periodes = np.array(groupe)
+        morceaux = np.array(etiquettes)
 
-            reducer = LDA(n_components=3, random_state=42)
-            X_lda = reducer.fit_transform(X_scaled)
-            print(f"X_lda : {X_lda}")
+        compteur = Counter(y)
+        indices_a_garder = [i for i, label in enumerate(y) if compteur[label] > 1]
 
-            df_lda = pd.DataFrame(X_lda, columns=['LD1', 'LD2', 'LD3'])
-            df_lda['composer'] = y
-            df_lda['morceau'] = morceaux
-            df_lda['groupe'] = periodes
+        X2 = X_scaled[indices_a_garder]
+        y2 = y[indices_a_garder]
+        groupe = [groupe[i] for i in indices_a_garder]
+        etiquettes = [etiquettes[i] for i in indices_a_garder]
 
-            fig = px.scatter_3d(
-                df_lda,
-                x='LD1', y='LD2', z='LD3',
-                color='composer',
-                hover_data={'morceau': True, 'composer': True, 'groupe': True},
-                title='Projection LDA 3D des morceaux par compositeur'
+        reducer = LDA(n_components=3)
+        reducer.fit(X2,y2)
+        X_lda = reducer.transform(X_scaled)
+
+        df_lda = pd.DataFrame(X_lda, columns=['LD1', 'LD2', 'LD3'])
+        print(f"Shape de df_lda : {df_lda.shape}")
+        print(X_lda)
+        df_lda['composer'] = y
+        df_lda['morceau'] = morceaux
+        df_lda['groupe'] = periodes
+
+        fig = px.scatter_3d(
+            df_lda,
+            x='LD1', y='LD2', z='LD3',
+            color='composer',
+            hover_data={'morceau': True, 'composer': True, 'groupe': True},
+            title='Projection LDA 3D des morceaux par compositeur'
+        )
+        fig.update_traces(marker=dict(size=4, opacity=0.8))
+        fig.update_traces(marker=dict(size=4))
+        buttons = [
+            dict(
+                label='Tout masquer',
+                method='restyle',
+                args=['visible', ['legendonly'] * len(fig.data)]
+            ),
+            dict(
+                label='Tout afficher',
+                method='restyle',
+                args=['visible', [True] * len(fig.data)]
             )
-            fig.update_traces(marker=dict(size=4, opacity=0.8))
-            fig.update_traces(marker=dict(size=4))
-            buttons = [
-                dict(label='Tout masquer',
-                    method='restyle',
-                    args=['visible', ['legendonly'] * len(fig.data)]),
-                
-                dict(label='Tout afficher',
-                    method='restyle',
-                    args=['visible', [True] * len(fig.data)])
-            ]
+        ]
 
-            fig.update_layout(
-                updatemenus=[dict(type='buttons', showactive=True, buttons=buttons)]
-            )
-            fig.show()
+        fig.update_layout(
+            updatemenus=[dict(type='buttons', showactive=True, buttons=buttons)]
+        )
+        fig.show()
     
 if __name__ == "__main__":
-    picklefile = "data_classicalsde.pkl"
+    #picklefile = "data_classicalsde.pkl"
+    picklefile = "data_musicopencollection.pkl"
     picklefile2 = "data_musicmasterpieces.pkl"
     audio_dir = "audiofiles/classicalsde_csv"
     audio_dir2 = "audiofiles/100ClassicalMusicMasterpieces_csv"
-    loudness_resolution = 60
+    loudness_resolution = 50
     overlap = 0.5
-    N = 4
+    N = 5
 
     bulk_preprocessing = BulkPreprocessing(picklefile, picklefile2, audio_dir, audio_dir2, loudness_resolution, overlap, N)
     
     #bulk_preprocessing.pickle_dump_audio_dir()
     #bulk_preprocessing.pickle_dump_audio_dir2()
-    bulk_preprocessing.pickle_dump_classicalsde()
+    #bulk_preprocessing.pickle_dump_classicalsde()
+
+
     
     bulk_preprocessing.test2()
 
