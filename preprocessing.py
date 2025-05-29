@@ -189,12 +189,18 @@ class BulkPreprocessing:
     def pickle_dump_classicalsde(self):
         chroma_dict = {}
         grouping_dict = {}
-        for racine, sous_dossiers, _ in os.walk(self.audio_dir):
-            for sous_dossier in sous_dossiers:
-                for racine2, sous_sous_dossiers, _ in os.walk(os.path.join(racine, sous_dossier)):
-                    for sous_sous_dossier in sous_sous_dossiers:
-                        if sous_sous_dossier.endswith(".csv"):
-                            file_path = os.path.join(racine2, sous_sous_dossier)
+        compo_dict = {}
+        for sous_dossier in [d for d in os.listdir(self.audio_dir) if os.path.isdir(os.path.join(self.audio_dir, d))]:
+            sous_dossier_path = os.path.join(self.audio_dir, sous_dossier)
+            composer_list = sous_dossier.split(',')
+            composer = f"{composer_list[1]} {composer_list[0]} ({composer_list[2]} - {composer_list[3]})"
+            print(f"Compositeur : {composer}")
+            for sous_sous_dossier in [d2 for d2 in os.listdir(sous_dossier_path) if os.path.isdir(os.path.join(sous_dossier_path, d2))]:
+                sous_sous_path = os.path.join(sous_dossier_path, sous_sous_dossier)
+                for filename in os.listdir(sous_sous_path):
+                    if filename.endswith('.csv'):
+                        file_path = os.path.join(sous_sous_path, filename)
+                        try:
                             df_csv = pd.read_csv(file_path)
                             df_csv = df_csv.iloc[:, 1:]
                             cols = df_csv.columns[1:]
@@ -207,25 +213,30 @@ class BulkPreprocessing:
                             print(f"Traitement du fichier : {file_path}")
                             print(f"Informations : {sous_dossier}, {sous_sous_dossier}")
                             grouping_dict[file_path] = (sous_dossier, sous_sous_dossier)
+                            compo_dict[file_path] = composer
+                        except:
+                            print(f"Erreur lors du traitement du fichier : {file_path}")
+                            continue
         dico = BulkPreprocessing.dico_hist(chroma_dict, loudness_resolution=self.loudness_resolution, N=self.N, overlap=self.overlap, verb=0)
         with open(self.picklefile, "wb") as f:
-            pickle.dump((dico, grouping_dict), f)
+            pickle.dump((dico, grouping_dict, compo_dict), f)
 
     
     def test2(self):
         with open(self.picklefile, "rb") as f:
-            dico_cross_era_sup, grouping_dict = pickle.load(f)
+            dico_cross_era_sup, grouping_dict, compo_dict = pickle.load(f)
+        print(dico_cross_era_sup.keys())
         X = []
         etiquettes = []
         y = []
         groupe = []
         for file, histograms in dico_cross_era_sup.items():
-            composer = BulkPreprocessing.get_composer_audio_dir(file)
+            composer = compo_dict[file]
             etiquettes.append(file)
             matrice = np.vstack(histograms)
             X.append(matrice.flatten())
             y.append(composer)
-            groupe.append(grouping_dict[file])
+            groupe.append(grouping_dict[file][1])
 
         X = np.array(X)
         print(f"Shape de X : {X.shape}")
@@ -247,8 +258,8 @@ class BulkPreprocessing:
         groupe = [groupe[i] for i in indices_a_garder]
         etiquettes = [etiquettes[i] for i in indices_a_garder]
 
-        reducer = LDA(n_components=3, random_state=42)
-        reducer.fit(X2)
+        reducer = LDA(n_components=3)
+        reducer.fit(X2,y2)
         X_lda = reducer.transform(X_scaled)
         print(f"X_lda : {X_lda}")
 
@@ -354,11 +365,11 @@ class BulkPreprocessing:
 if __name__ == "__main__":
     picklefile = "data_classicalsde.pkl"
     picklefile2 = "data_musicmasterpieces.pkl"
-    audio_dir = "audiofiles/MusopenCollectionAsFlac_csv"
+    audio_dir = "audiofiles/classicalsde_csv"
     audio_dir2 = "audiofiles/100ClassicalMusicMasterpieces_csv"
-    loudness_resolution = 50
+    loudness_resolution = 60
     overlap = 0.5
-    N = 3
+    N = 4
 
     bulk_preprocessing = BulkPreprocessing(picklefile, picklefile2, audio_dir, audio_dir2, loudness_resolution, overlap, N)
     
