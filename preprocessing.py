@@ -214,8 +214,9 @@ class BulkPreprocessing:
                             print(f"Informations : {sous_dossier}, {sous_sous_dossier}")
                             grouping_dict[file_path] = (sous_dossier, sous_sous_dossier)
                             compo_dict[file_path] = composer
-                        except:
+                        except Exception as e:
                             print(f"Erreur lors du traitement du fichier : {file_path}")
+                            print(e)
                             continue
         dico = BulkPreprocessing.dico_hist(chroma_dict, loudness_resolution=self.loudness_resolution, N=self.N, overlap=self.overlap, verb=0)
         with open(self.picklefile, "wb") as f:
